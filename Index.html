@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CorkBoard — Downtown San Jose</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Libre+Franklin:wght@400;500;600;700&display=swap');
+
+  :root{
+    --paper2: #fdf8ec;
+    --ink: #2b2420;
+    --pin-red: #b8413a;
+    --pin-blue: #3c5a73;
+    --pin-green: #4f6b4a;
+    --pin-gold: #a9821f;
+    --pin-purple: #6a4e7a;
+    --frame: #1c1714;
+    --frame-grain: #2a221c;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Libre Franklin', sans-serif;
+    color:var(--ink);
+    background:#3a342e;
+    min-height:100vh;
+  }
+
+  .topnav{ display:flex; justify-content:center; gap:8px; padding:14px 16px 0;}
+  .topnav button{
+    font-family:'Special Elite', monospace; font-size:13px; letter-spacing:1px;
+    background:#54493e; color:#e8ddc9; border:none; padding:9px 18px;
+    cursor:pointer; border-radius:3px 3px 0 0; opacity:0.7;
+  }
+  .topnav button.active{ background:var(--frame); opacity:1;}
+
+  header{ text-align:center; padding:22px 16px 10px;}
+  header h1{
+    font-family:'Special Elite', monospace; font-size:clamp(30px, 7vw, 46px);
+    margin:4px 0; color:#f0e6d2; letter-spacing:1px;
+  }
+  header p{ color:#cdbfa3; font-size:14px; margin:0;}
+
+  .filters{
+    display:flex; gap:8px; justify-content:center; flex-wrap:wrap;
+    padding:14px 16px 4px; max-width:900px; margin:0 auto;
+  }
+  .chip{
+    font-size:12px; font-family:'Libre Franklin', sans-serif; font-weight:600;
+    background:#54493e; color:#e8ddc9; border:none; border-radius:20px;
+    padding:7px 14px; cursor:pointer; opacity:0.75;
+  }
+  .chip.active{ opacity:1; box-shadow:0 0 0 2px #e8ddc9 inset;}
+
+  .frame-wrap{ max-width:1000px; margin:14px auto 50px; padding:0 14px;}
+  .black-frame{
+    background:
+      repeating-linear-gradient(95deg, var(--frame) 0px, var(--frame-grain) 3px, var(--frame) 6px);
+    border-radius:6px; padding:20px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.5), inset 0 0 0 5px #0d0a08;
+  }
+  .cork{
+    background-color:#c9a877;
+    background-image:
+      radial-gradient(circle at 5% 8%, rgba(70,45,20,0.28) 0 2px, transparent 3px),
+      radial-gradient(circle at 14% 28%, rgba(70,45,20,0.24) 0 1.6px, transparent 3px),
+      radial-gradient(circle at 23% 5%, rgba(70,45,20,0.26) 0 1.8px, transparent 3px),
+      radial-gradient(circle at 31% 45%, rgba(70,45,20,0.22) 0 2px, transparent 3px),
+      radial-gradient(circle at 9% 62%, rgba(70,45,20,0.25) 0 1.6px, transparent 3px),
+      radial-gradient(circle at 40% 18%, rgba(70,45,20,0.24) 0 2px, transparent 3px),
+      radial-gradient(circle at 47% 60%, rgba(70,45,20,0.2) 0 1.8px, transparent 3px),
+      radial-gradient(circle at 55% 9%, rgba(70,45,20,0.26) 0 2px, transparent 3px),
+      radial-gradient(circle at 62% 35%, rgba(70,45,20,0.22) 0 1.6px, transparent 3px),
+      radial-gradient(circle at 68% 70%, rgba(70,45,20,0.25) 0 2px, transparent 3px),
+      radial-gradient(circle at 76% 14%, rgba(70,45,20,0.24) 0 1.8px, transparent 3px),
+      radial-gradient(circle at 83% 48%, rgba(70,45,20,0.22) 0 1.6px, transparent 3px),
+      radial-gradient(circle at 90% 22%, rgba(70,45,20,0.26) 0 2px, transparent 3px),
+      radial-gradient(circle at 95% 65%, rgba(70,45,20,0.2) 0 1.6px, transparent 3px),
+      radial-gradient(circle at 18% 85%, rgba(70,45,20,0.22) 0 1.8px, transparent 3px),
+      radial-gradient(circle at 38% 88%, rgba(70,45,20,0.2) 0 2px, transparent 3px),
+      radial-gradient(circle at 58% 90%, rgba(70,45,20,0.24) 0 1.6px, transparent 3px),
+      radial-gradient(circle at 78% 92%, rgba(70,45,20,0.22) 0 1.8px, transparent 3px),
+      radial-gradient(circle at 97% 88%, rgba(70,45,20,0.2) 0 1.6px, transparent 3px),
+      radial-gradient(circle at 3% 95%, rgba(70,45,20,0.22) 0 1.8px, transparent 3px),
+      linear-gradient(160deg, rgba(255,230,180,0.14), transparent 40%),
+      linear-gradient(-20deg, rgba(60,35,15,0.14), transparent 50%);
+    background-size: 55px 55px, 48px 48px, 60px 60px, 50px 50px, 58px 58px, 52px 52px, 62px 62px,
+      54px 54px, 56px 56px, 50px 50px, 60px 60px, 52px 52px, 58px 58px, 54px 54px,
+      56px 56px, 50px 50px, 58px 58px, 52px 52px, 54px 54px, 56px 56px, 100% 100%, 100% 100%;
+    border-radius:2px; padding:26px;
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:30px;
+    box-shadow: inset 0 0 70px rgba(0,0,0,0.22);
+  }
+
+  .flyer{
+    position:relative; background:var(--paper2); box-shadow: 0 12px 22px rgba(0,0,0,0.3);
+    cursor:pointer; transition: transform 0.2s ease; overflow:hidden;
+  }
+  .flyer:nth-child(odd){ transform: rotate(-1.6deg);}
+  .flyer:nth-child(even){ transform: rotate(1.4deg);}
+  .flyer:hover{ transform: scale(1.03) rotate(0deg); z-index:2;}
+  .flyer.hidden{ display:none;}
+
+  .pin-dot{
+    position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+    width:20px; height:20px; border-radius:50%;
+    box-shadow:0 3px 4px rgba(0,0,0,0.4), inset 0 2px 3px rgba(255,255,255,0.4); z-index:3;
+  }
+  .pin-dot.market{background:radial-gradient(circle at 35% 30%, #7a9874, var(--pin-green));}
+  .pin-dot.shop{background:radial-gradient(circle at 35% 30%, #e0655d, var(--pin-red));}
+  .pin-dot.artwalk{background:radial-gradient(circle at 35% 30%, #5d84a0, var(--pin-blue));}
+  .pin-dot.foodhall{background:radial-gradient(circle at 35% 30%, #cda43a, var(--pin-gold));}
+  .pin-dot.cityart{background:radial-gradient(circle at 35% 30%, #9376a3, var(--pin-purple));}
+
+  .flyer-photo{ width:100%; height:130px; background-size:cover; background-position:center; position:relative;}
+  .flyer-photo .upload-label{
+    position:absolute; bottom:6px; right:6px; background:rgba(0,0,0,0.55); color:#fff;
+    font-size:10px; padding:4px 8px; border-radius:12px; cursor:pointer; font-family:'Libre Franklin', sans-serif;
+  }
+  .flyer-body{ padding:16px 18px 18px;}
+  .category{
+    font-family:'Special Elite', monospace; font-size:10px; text-transform:uppercase;
+    letter-spacing:2px; padding:3px 8px; display:inline-block; margin-bottom:8px; color:#fff;
+  }
+  .category.market{background:var(--pin-green);}
+  .category.shop{background:var(--pin-red);}
+  .category.artwalk{background:var(--pin-blue);}
+  .category.foodhall{background:var(--pin-gold);}
+  .category.cityart{background:var(--pin-purple);}
+
+  .flyer h2{ font-family:'Special Elite', monospace; font-size:18px; margin:0 0 4px; line-height:1.2; color:#1a1612;}
+  .flyer .when{ font-weight:700; font-size:13px; margin-bottom:2px; color:#7a2e28;}
+  .flyer .where{ font-size:12px; opacity:0.7;}
+
+  .add-flyer{
+    border:3px dashed rgba(40,30,20,0.4); text-align:center; padding:30px 16px; min-height:160px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    cursor:pointer; color:#2a2015; background:rgba(255,255,255,0.12);
+  }
+  .add-flyer .plus{ font-size:36px; font-family:'Special Elite', monospace; line-height:1;}
+  .add-flyer span{ font-size:13px;}
+
+  .map-wrap{ max-width:1000px; margin:0 auto 50px; padding:0 14px;}
+  .map-legend{ display:flex; gap:14px; justify-content:center; margin-bottom:14px; flex-wrap:wrap;}
+  .legend-item{ display:flex; align-items:center; gap:6px; color:#e8ddc9; font-size:12px;}
+  .legend-dot{ width:13px; height:13px; border-radius:50%;}
+  .legend-dot.market{background:var(--pin-green);}
+  .legend-dot.shop{background:var(--pin-red);}
+  .legend-dot.artwalk{background:var(--pin-blue);}
+  .legend-dot.foodhall{background:var(--pin-gold);}
+  .legend-dot.cityart{background:var(--pin-purple);}
+
+  .map-frame{ background:var(--frame); border-radius:6px; padding:14px; box-shadow: 0 18px 40px rgba(0,0,0,0.5);}
+  .map-canvas{
+    position:relative; background:#dfe4d8; border-radius:3px; height:480px; overflow:hidden;
+    background-image:
+      linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px),
+      linear-gradient(0deg, rgba(255,255,255,0.5) 1px, transparent 1px),
+      linear-gradient(120deg, #d7e0d0 25%, #dfe4d8 25%, #dfe4d8 50%, #d7e0d0 50%, #d7e0d0 75%, #dfe4d8 75%);
+    background-size: 40px 40px, 40px 40px, 160px 160px;
+  }
+  .park-circle{
+    position:absolute; width:90px; height:90px; border-radius:50%;
+    background:radial-gradient(circle, #a8c79a, #8eb27d);
+    border:3px solid #6f9460; left:46%; top:18%; transform:translate(-50%,-50%);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+  }
+  .park-circle span{ font-size:10px; font-weight:700; color:#2e4023;}
+  .map-pin{
+    position:absolute; width:30px; height:30px; border-radius:50% 50% 50% 0;
+    transform:rotate(-45deg) translate(-50%,-100%); box-shadow:0 3px 6px rgba(0,0,0,0.4);
+    cursor:pointer; display:flex; align-items:center; justify-content:center; transition: transform 0.15s ease;
+  }
+  .map-pin:hover{ transform:rotate(-45deg) translate(-50%,-100%) scale(1.15);}
+  .map-pin span{ transform:rotate(45deg); color:#fff; font-size:13px; font-weight:700;}
+  .map-pin.market{ background:var(--pin-green);}
+  .map-pin.shop{ background:var(--pin-red);}
+  .map-pin.artwalk{ background:var(--pin-blue);}
+  .map-pin.foodhall{ background:var(--pin-gold);}
+  .map-pin.cityart{ background:var(--pin-purple);}
+  .map-label{
+    position:absolute; font-size:11px; font-weight:600; background:rgba(255,255,255,0.85);
+    padding:2px 6px; border-radius:3px; white-space:nowrap; transform:translate(-50%, 4px); pointer-events:none;
+  }
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(15,12,9,0.78); display:none;
+    align-items:center; justify-content:center; padding:18px; z-index:20;
+  }
+  .overlay.open{ display:flex;}
+  .detail, .formCard{
+    background:var(--paper2); max-width:440px; width:100%; max-height:90vh; overflow-y:auto;
+    box-shadow:0 25px 60px rgba(0,0,0,0.5); border-radius:4px; position:relative;
+  }
+  .detail-photo{ width:100%; height:190px; background-size:cover; background-position:center; cursor:zoom-in;}
+  .big-close{
+    position:absolute; top:10px; right:10px; width:38px; height:38px; border-radius:50%;
+    background:#e8503f; color:#fff; border:3px solid #fff; font-size:18px; font-weight:700;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 3px 8px rgba(0,0,0,0.4); z-index:5;
+  }
+  .detail-body, .form-body{ padding:20px 22px 26px;}
+  .detail-body h2, .form-body h2{ font-family:'Special Elite', monospace; font-size:22px; margin:0 0 8px;}
+  .detail-body .when{ font-weight:700; font-size:14px; color:#7a2e28;}
+  .loc-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    margin:6px 0 14px; flex-wrap:wrap;
+  }
+  .loc-row .where{ font-size:13px; opacity:0.75;}
+  .detail-body p.desc{ font-size:14px; line-height:1.55; margin-bottom:14px;}
+  .note-missing{
+    font-size:12.5px; background:#f3e6c5; border-left:4px solid var(--pin-gold);
+    padding:8px 10px; margin-bottom:14px; font-style:italic;
+  }
+  .btn{
+    font-family:'Special Elite', monospace; border:none; padding:9px 14px; cursor:pointer;
+    font-size:12px; letter-spacing:0.5px; border-radius:3px; text-decoration:none;
+    display:inline-block; color:#fff; white-space:nowrap;
+  }
+  .btn.maps{ background:var(--pin-blue);}
+  .btn.primary{ background:var(--pin-green);}
+  .btn.ghost{ background:#7a6f5f;}
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;}
+  .tag{ font-size:11px; border:1px solid var(--ink); border-radius:20px; padding:3px 10px; opacity:0.75;}
+
+  .vendor-groups{ margin-top:18px; border-top:1px dashed #c9bb9e; padding-top:14px;}
+  .vendor-filter-row{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;}
+  .vfchip{
+    font-size:11px; font-weight:600; background:#e9ddc2; border:none; border-radius:14px;
+    padding:5px 10px; cursor:pointer; opacity:0.7;
+  }
+  .vfchip.active{ opacity:1; background:var(--pin-gold); color:#fff;}
+  .vendor-groups h3{
+    font-family:'Special Elite', monospace; font-size:13px; text-transform:uppercase;
+    letter-spacing:1.5px; margin:16px 0 8px; color:var(--pin-green);
+  }
+  .vendor-groups h3:first-child{ margin-top:0;}
+  .vendor-item{ font-size:13.5px; line-height:1.5; margin-bottom:4px;}
+  .vendor-item.hidden{ display:none;}
+  .note{ font-size:12px; opacity:0.65; font-style:italic;}
+  .add-vendor-btn{
+    margin-top:14px; background:#e9ddc2; border:1px dashed #a9821f; color:#5a4a1c;
+    font-size:12.5px; padding:8px 12px; border-radius:4px; cursor:pointer; width:100%;
+  }
+
+  .form-body label{ display:block; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 4px; opacity:0.7;}
+  .form-body input, .form-body textarea, .form-body select{
+    width:100%; padding:9px 10px; border:1px solid #c9bb9e; background:#fff;
+    font-family:'Libre Franklin', sans-serif; font-size:14px;
+  }
+  .form-body textarea{ resize:vertical; min-height:60px;}
+  .form-actions{ margin-top:20px; display:flex; gap:10px; justify-content:flex-end;}
+
+  .zoomview{
+    position:fixed; inset:0; background:rgba(0,0,0,0.92); display:none;
+    align-items:center; justify-content:center; z-index:30; cursor:zoom-out; padding:20px;
+  }
+  .zoomview.open{ display:flex;}
+  .zoomview img{ max-width:100%; max-height:100%; border-radius:4px;}
+
+  footer{ text-align:center; color:#cdbfa3; font-size:12px; padding:0 16px 30px;}
+
+  @media (max-width:480px){ .flyer:nth-child(n){ transform:rotate(0deg) !important;} }
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <button class="active" id="navBoard">📌 Board</button>
+  <button id="navMap">🗺️ Map</button>
+</div>
+
+<header>
+  <h1>CorkBoard</h1>
+  <p>Downtown San Jose · tap a flyer or a pin to open it</p>
+</header>
+
+<div class="filters" id="filters">
+  <button class="chip active" data-filter="all">All</button>
+  <button class="chip" data-filter="market">Markets</button>
+  <button class="chip" data-filter="foodhall">Food Hall</button>
+  <button class="chip" data-filter="artwalk">Art Walk</button>
+  <button class="chip" data-filter="cityart">City Art</button>
+</div>
+
+<div class="frame-wrap" id="boardView">
+  <div class="black-frame"><div class="cork" id="cork"></div></div>
+</div>
+
+<div class="map-wrap" id="mapView" style="display:none;">
+  <div class="map-legend">
+    <div class="legend-item"><span class="legend-dot market"></span> Markets</div>
+    <div class="legend-item"><span class="legend-dot foodhall"></span> Food Hall</div>
+    <div class="legend-item"><span class="legend-dot artwalk"></span> Art Walk</div>
+    <div class="legend-item"><span class="legend-dot cityart"></span> City Art</div>
+  </div>
+  <div class="map-frame">
+    <div class="map-canvas" id="mapCanvas">
+      <div class="park-circle"><span>Plaza de<br>César Chávez</span></div>
+    </div>
+  </div>
+</div>
+
+<footer>Real vendor info where confirmed · unconfirmed details are marked · your posted flyers save on this device.</footer>
+
+<div class="overlay" id="overlay"><div id="overlayInner"></div></div>
+<div class="zoomview" id="zoomview"><img id="zoomImg" src=""></div>
+
+<script>
+const defaultListings = [
+  {
+    id:'farmersmarket', cat:'market', catLabel:'Weekly Market',
+    title:"Downtown San Jose Farmers' Market",
+    when:'Wednesdays · 9:00am – 1:30pm (closed all other days)',
+    where:'101 Paseo de San Antonio, San Jose, CA 95113',
+    desc:"Seasonal fruits, vegetables, and artisanal goods from local vendors. 90 minutes of complimentary parking at the ParkSJ garage, entrances on 2nd and 3rd Street.",
+    tags:['Produce','Weekly','Parking Available'], photo:'', mapX:'25%', mapY:'58%', missing:'',
+    vendorGroups:[
+      { group:'Farmers', items:['Xiong Farms — Asian veggies','Lopez Family Farm — conventional fruits','Bay Fresh — conventional strawberries','Green Mix Ranch — organic veggies']},
+      { group:'Packaged Food', items:['California Bakeshop — artisanal bakery, cookies, empanadas',"Brother's Products S.F. — hummus, yogurt",'Hurno — specialty pastries','Mango Blossom Apiary — honey','Baby Tiger Bakery — conchas, baked goods','Valley Toffee LLC — multi-variety toffee']},
+      { group:'Hot Food', items:['Dumpling King — dumplings',"Chiken's Tamales — tamales, vegan empanadas",'Thai Street Food — chicken satay, papaya salad, thai tea & more',"Jaden's Kettle Corn — kettle corn",'Cuisina Express — Filipino food']},
+      { group:'Arts and Crafts', items:['Sea Moss Healing — sea moss soaps and other products','Plant Code — essential oils <span class="note">(every 2nd and 4th Wednesday)</span>','Starme — handmade clothes <span class="note">(out for season)</span>']}
+    ]
+  },
+  {
+    id:'sofamarket', cat:'foodhall', catLabel:'Food Hall · Open Daily', title:'SoFA Market',
+    when:'Open Daily · 11:00am – 9:00pm (hours vary by vendor)',
+    where:'387 S 1st St, San Jose, CA 95113',
+    desc:'A permanent downtown food hall with multiple restaurants and a bar under one roof. sofamarketsj.com · (408) 642-5270',
+    tags:['Food Hall','Daily','Permanent Location'], photo:'', mapX:'55%', mapY:'42%', missing:'',
+    vendorGroups:[
+      { group:'Restaurants', items:[
+        'Vietnoms — pho, banh mi, Vietnamese classics & fusion · Ste 121 · 11:30am–7pm (8pm Fri/Sat)',
+        '3 Hermanos Mexican Restaurant — tacos, burritos, cocktail bar · #105 · 9am–9pm',
+        'Pizzeria Rosa Maria — pizza · #104 · 11am–3pm & 4:30–8:30pm (Sat/Sun 11am–8:30pm)',
+        'Umi Hand Roll Bar — sushi hand rolls, outdoor seating · 10:30am–8/9pm',
+        'Habana Cuba Restaurant — Cuban food · closed Mondays, 11am–8:30pm other days',
+        'Iscu Tea — <span class="note">temporarily closed</span>'
+      ]},
+      { group:'Bar', items:['Fountainhead Bar — cocktails, located at the very back of SoFA Market · Noon–9pm · you can bring food from any vendor in the market to enjoy with your drinks']}
+    ]
+  },
+  {
+    id:'artwalk', cat:'artwalk', catLabel:'Monthly Art Walk', title:'South First Fridays ArtWalk',
+    when:'First Friday Monthly (dark Jan & July) · 5:00pm – 9:00pm',
+    where:'South 1st Street, SoFA District, Downtown San Jose',
+    desc:'A free, self-guided evening tour through downtown galleries, museums, live music, and street vendors. 100% free and family-friendly.',
+    tags:['Art','Music','Free','Monthly'], photo:'', mapX:'50%', mapY:'20%',
+    missing:'Still need to confirm: which galleries are open this specific Friday, the vendor list, whether the beer garden is happening, and whether the vintage clothes market is set up this month.',
+    vendorGroups:[]
+  },
+  {
+    id:'gaiascope', cat:'cityart', catLabel:'City Art Installation', title:'Gaiascope at Circle of Palms',
+    when:'On display May 22 – August 18, 2026',
+    where:'Circle of Palms Plaza, 127 S Market St, San Jose, CA 95113',
+    desc:'Artist Brooke Einbender presents three suspended kaleidoscope sculptures, supported by steel cables, offering a distinct visual experience. Found via the City of San Jose Downtown site.',
+    tags:['Public Art','City of San Jose','Long-Term Display'], photo:'', mapX:'68%', mapY:'62%', missing:'',
+    vendorGroups:[]
+  }
+];
+
+let listings = [];
+let activeFilter = 'all';
+const STORAGE_KEY = 'corkboard-listings';
+
+const cork = document.getElementById('cork');
+const mapCanvas = document.getElementById('mapCanvas');
+const overlay = document.getElementById('overlay');
+const overlayInner = document.getElementById('overlayInner');
+const zoomview = document.getElementById('zoomview');
+const zoomImg = document.getElementById('zoomImg');
+
+async function loadData(){
+  try{
+    const result = await window.storage.get(STORAGE_KEY, false);
+    listings = result && result.value ? JSON.parse(result.value) : JSON.parse(JSON.stringify(defaultListings));
+  }catch(e){
+    listings = JSON.parse(JSON.stringify(defaultListings));
+  }
+  renderBoard();
+  renderMap();
+}
+
+async function saveData(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify(listings), false);
+  }catch(e){
+    console.error('Could not save', e);
+  }
+}
+
+function renderBoard(){
+  cork.innerHTML = '';
+  listings.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'flyer' + (activeFilter !== 'all' && item.cat !== activeFilter ? ' hidden' : '');
+    card.innerHTML = `
+      <div class="pin-dot ${item.cat}"></div>
+      <div class="flyer-photo" style="background-image:${item.photo ? `url(${item.photo})` : 'none'}; background-color:${item.photo ? 'transparent' : '#cfc3a8'};">
+        <label class="upload-label" onclick="event.stopPropagation()">
+          + photo
+          <input type="file" accept="image/*" style="display:none" onchange="handleUpload(event,'${item.id}')">
+        </label>
+      </div>
+      <div class="flyer-body">
+        <span class="category ${item.cat}">${item.catLabel}</span>
+        <h2>${item.title}</h2>
+        <div class="when">${item.when}</div>
+        <div class="where">${item.where}</div>
+      </div>
+    `;
+    card.addEventListener('click', () => openDetail(item.id));
+    cork.appendChild(card);
+  });
+
+  const addCard = document.createElement('div');
+  addCard.className = 'add-flyer';
+  addCard.innerHTML = `<div class="plus">+</div><span>Post your own flyer</span>`;
+  addCard.addEventListener('click', openPostForm);
+  cork.appendChild(addCard);
+}
+
+function renderMap(){
+  mapCanvas.querySelectorAll('.map-pin, .map-label').forEach(p => p.remove());
+  listings.forEach(item => {
+    const icon = item.cat === 'market' ? '🌽' : item.cat === 'foodhall' ? '🍽️' : item.cat === 'cityart' ? '🎭' : '🎨';
+    const pin = document.createElement('div');
+    pin.className = `map-pin ${item.cat}`;
+    pin.style.left = item.mapX; pin.style.top = item.mapY;
+    pin.innerHTML = `<span>${icon}</span>`;
+    pin.addEventListener('click', () => openDetail(item.id));
+    mapCanvas.appendChild(pin);
+
+    const label = document.createElement('div');
+    label.className = 'map-label';
+    label.style.left = item.mapX; label.style.top = item.mapY;
+    label.textContent = item.title.split(' ').slice(0,2).join(' ');
+    mapCanvas.appendChild(label);
+  });
+}
+
+function openDetail(id){
+  const item = listings.find(l => l.id === id);
+  const mapsUrl = 'https://www.google.com/maps/search/' + encodeURIComponent(item.where);
+  let groupsHtml = '';
+  if(item.vendorGroups && item.vendorGroups.length){
+    const allGroupNames = item.vendorGroups.map(g => g.group);
+    groupsHtml = '<div class="vendor-groups">' +
+      `<div class="vendor-filter-row">
+        <button class="vfchip active" data-vf="all" onclick="filterVendors(this,'all')">All</button>
+        ${allGroupNames.map(g => `<button class="vfchip" data-vf="${g}" onclick="filterVendors(this,'${g}')">${g}</button>`).join('')}
+      </div>` +
+      item.vendorGroups.map(g => `
+        <h3 data-group="${g.group}">${g.group}</h3>
+        ${g.items.map(v => `<div class="vendor-item" data-group="${g.group}">${v}</div>`).join('')}
+      `).join('') +
+      `<button class="add-vendor-btn" onclick="openVendorForm('${item.id}')">+ Suggest a vendor we're missing</button>` +
+      '</div>';
+  } else {
+    groupsHtml = `<div class="vendor-groups"><button class="add-vendor-btn" onclick="openVendorForm('${item.id}')">+ Suggest a vendor or detail we're missing</button></div>`;
+  }
+  const missingHtml = item.missing ? `<div class="note-missing">⚠️ ${item.missing}</div>` : '';
+  overlayInner.innerHTML = `
+    <div class="detail">
+      <div class="big-close" onclick="closeOverlay()">✕</div>
+      <div class="detail-photo" style="background-image:${item.photo ? `url(${item.photo})` : 'none'}; background-color:${item.photo ? 'transparent' : '#cfc3a8'};" onclick="zoomPhoto('${item.photo}')"></div>
+      <div class="detail-body">
+        <span class="category ${item.cat}">${item.catLabel}</span>
+        <h2>${item.title}</h2>
+        <div class="when">${item.when}</div>
+        <div class="loc-row">
+          <span class="where">📍 ${item.where}</span>
+          <a class="btn maps" href="${mapsUrl}" target="_blank">Open in Maps</a>
+        </div>
+        ${missingHtml}
+        <p class="desc">${item.desc}</p>
+        <div class="tag-row">${item.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+        ${groupsHtml}
+      </div>
+    </div>
+  `;
+  overlay.classList.add('open');
+}
+
+function filterVendors(btn, group){
+  const container = btn.closest('.vendor-groups');
+  container.querySelectorAll('.vfchip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  container.querySelectorAll('h3, .vendor-item').forEach(el => {
+    if(group === 'all' || el.dataset.group === group){ el.classList.remove('hidden'); }
+    else { el.classList.add('hidden'); }
+  });
+}
+
+function closeOverlay(){ overlay.classList.remove('open'); overlayInner.innerHTML=''; }
+function zoomPhoto(photo){ if(!photo) return; zoomImg.src = photo; zoomview.classList.add('open'); }
+zoomview.addEventListener('click', () => zoomview.classList.remove('open'));
+
+function handleUpload(event, id){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const item = listings.find(l => l.id === id);
+    item.photo = e.target.result;
+    renderBoard();
+    saveData();
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ---- Post a new flyer ---- */
+function openPostForm(){
+  overlayInner.innerHTML = `
+    <div class="formCard">
+      <div class="big-close" onclick="closeOverlay()">✕</div>
+      <div class="form-body">
+        <h2>Post a flyer</h2>
+        <label>Title</label>
+        <input id="pf-title" type="text" placeholder="e.g. Maple & Mint Candy Shop">
+        <label>Category</label>
+        <select id="pf-cat">
+          <option value="shop">Shop</option>
+          <option value="market">Market</option>
+          <option value="foodhall">Food Hall</option>
+          <option value="artwalk">Event / Art Walk</option>
+          <option value="cityart">City / Public Art</option>
+        </select>
+        <label>When</label>
+        <input id="pf-when" type="text" placeholder="e.g. Open Daily, 11am–7pm">
+        <label>Where</label>
+        <input id="pf-where" type="text" placeholder="e.g. 123 Main St, San Jose, CA">
+        <label>Description</label>
+        <textarea id="pf-desc" placeholder="A few sentences about it"></textarea>
+        <label>Photo (optional)</label>
+        <input id="pf-photo" type="file" accept="image/*">
+        <div class="form-actions">
+          <button class="btn ghost" onclick="closeOverlay()">Cancel</button>
+          <button class="btn primary" onclick="submitNewFlyer()">Pin it up</button>
+        </div>
+      </div>
+    </div>
+  `;
+  overlay.classList.add('open');
+}
+
+function submitNewFlyer(){
+  const title = document.getElementById('pf-title').value.trim();
+  const cat = document.getElementById('pf-cat').value;
+  const when = document.getElementById('pf-when').value.trim();
+  const where = document.getElementById('pf-where').value.trim();
+  const desc = document.getElementById('pf-desc').value.trim();
+  const photoFile = document.getElementById('pf-photo').files[0];
+
+  if(!title || !where){
+    alert('Please add at least a title and location.');
+    return;
+  }
+
+  const catLabels = { shop:'Local Shop', market:'Market', foodhall:'Food Hall', artwalk:'Event', cityart:'City / Public Art' };
+  const newItem = {
+    id: 'user-' + Date.now(),
+    cat, catLabel: catLabels[cat] || 'Listing',
+    title, when: when || 'Hours not listed yet', where,
+    desc: desc || '', tags:['Community Posted'], photo:'',
+    mapX: (30 + Math.random()*40) + '%', mapY: (30 + Math.random()*40) + '%',
+    missing:'', vendorGroups:[]
+  };
+
+  function finish(){
+    listings.push(newItem);
+    closeOverlay();
+    renderBoard();
+    renderMap();
+    saveData();
+  }
+
+  if(photoFile){
+    const reader = new FileReader();
+    reader.onload = e => { newItem.photo = e.target.result; finish(); };
+    reader.readAsDataURL(photoFile);
+  } else {
+    finish();
+  }
+}
+
+/* ---- Suggest a missing vendor ---- */
+function openVendorForm(listingId){
+  overlayInner.innerHTML = `
+    <div class="formCard">
+      <div class="big-close" onclick="closeOverlay()">✕</div>
+      <div class="form-body">
+        <h2>Suggest a vendor</h2>
+        <label>Group / category (e.g. Hot Food, Bar, Crafts)</label>
+        <input id="vf-group" type="text" placeholder="e.g. Hot Food">
+        <label>Vendor name & description</label>
+        <input id="vf-name" type="text" placeholder="e.g. Joe's Tacos — street tacos, horchata">
+        <div class="form-actions">
+          <button class="btn ghost" onclick="closeOverlay()">Cancel</button>
+          <button class="btn primary" onclick="submitVendor('${listingId}')">Submit</button>
+        </div>
+      </div>
+    </div>
+  `;
+  overlay.classList.add('open');
+}
+
+function submitVendor(listingId){
+  const group = document.getElementById('vf-group').value.trim() || 'Suggested';
+  const name = document.getElementById('vf-name').value.trim();
+  if(!name){ alert('Please add a vendor name.'); return; }
+
+  const item = listings.find(l => l.id === listingId);
+  let g = item.vendorGroups.find(gr => gr.group.toLowerCase() === group.toLowerCase());
+  if(!g){ g = { group, items:[] }; item.vendorGroups.push(g); }
+  g.items.push(name + ' <span class="note">(suggested — pending confirmation)</span>');
+
+  closeOverlay();
+  saveData();
+  openDetail(listingId);
+}
+
+document.getElementById('navBoard').addEventListener('click', () => {
+  document.getElementById('boardView').style.display = 'block';
+  document.getElementById('filters').style.display = 'flex';
+  document.getElementById('mapView').style.display = 'none';
+  document.getElementById('navBoard').classList.add('active');
+  document.getElementById('navMap').classList.remove('active');
+});
+document.getElementById('navMap').addEventListener('click', () => {
+  document.getElementById('boardView').style.display = 'none';
+  document.getElementById('filters').style.display = 'none';
+  document.getElementById('mapView').style.display = 'block';
+  document.getElementById('navMap').classList.add('active');
+  document.getElementById('navBoard').classList.remove('active');
+});
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.dataset.filter;
+    renderBoard();
+  });
+});
+
+loadData();
+</script>
+
+</body>
+</html>
